@@ -9,4 +9,5 @@ edition = "2021"
 canvasapi = { version = "0.5.0", features = ["blocking"] }
 clap = { version = "4.0.32", features = ["derive"] }
 colored = "2.0.0"
+config = { version = "0.13.3", features = ["toml"] }
 regex = "1.7.0"

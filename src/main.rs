@@ -3,9 +3,8 @@ use canvasapi::canvas::CanvasInformation;
 use canvasapi::prelude::{Assignment, Canvas, Course};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
+use config::{Config};
 use regex::Regex;
-
-// token: 5359~DyffhDbpeX2h7hFTF77owWNgHU6tStx6JZniDoAplFOC8lWCRJqv66rnSXSZ5YfK
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -29,10 +28,15 @@ enum Commands {
 fn main() {
     let args = Args::parse();
 
-    let base_url = "https://sluh.instructure.com/";
-    let canvas_token = "5359~DyffhDbpeX2h7hFTF77owWNgHU6tStx6JZniDoAplFOC8lWCRJqv66rnSXSZ5YfK";
+    let settings = Config::builder()
+        .add_source(config::File::with_name("./assigner-config"))
+        .build()
+        .unwrap();
 
-    let canvas = CanvasInformation::new(base_url, canvas_token);
+    let base_url = settings.get_string("base_url").expect("Field 'base_url' undefined in config");
+    let canvas_token = settings.get_string("canvas_token").expect("Field 'canvas_token' undefined in config");
+
+    let canvas = CanvasInformation::new(&*base_url, &*canvas_token);
 
     match &args.command {
         Commands::Create { name } => {
@@ -122,18 +126,6 @@ fn print_assignments(assignments: Vec<Assignment>, max: usize) {
             } else {
                 println!("({}) Unknown Assignment", i + 1);
             }
-        }
-    }
-}
-
-fn print_courses(courses: Vec<Course>, max: usize) {
-    for i in 0..courses.len() {
-        if i > (max - 1) { break; }
-        let course = courses.get(i).unwrap();
-        if let Some(name) = &course.name {
-            println!("({}) {}", i + 1, name)
-        } else {
-            println!("({}) Unknown Course", i + 1)
         }
     }
 }
