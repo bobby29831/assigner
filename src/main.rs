@@ -3,7 +3,7 @@ use canvasapi::canvas::CanvasInformation;
 use canvasapi::prelude::{Assignment, Canvas, Course};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use config::{Config};
+use config::Config;
 use regex::Regex;
 
 #[derive(Parser)]
@@ -28,6 +28,28 @@ enum Commands {
 fn main() {
     let args = Args::parse();
 
+    if File::open("./assigner-config.toml").is_err() {
+        println!("It appears that this is your first time using assigner, or your configuration was deleted.");
+
+        let mut base_url = String::new();
+        println!("Because of this, please input your base canvas URL:");
+        std::io::stdin().read_line(&mut base_url).expect("Failure to read canvas URL from input");
+
+        let mut canvas_token = String::new();
+        println!("Please input your canvas token:");
+        std::io::stdin().read_line(&mut canvas_token).expect("Failure to read canvas URL from input");
+
+        match File::create("./assigner-config.toml") {
+            Ok(file) => {
+                let data = format!("base_url = \"{}\"\ncanvas_token = \"{}\"", base_url.trim(), canvas_token.trim());
+                std::fs::write("./assigner-config.toml", data).expect("Failure to write data to file.");
+            }
+            Err(_) => {
+                println!("Failure to create assigner configuration file.")
+            }
+        }
+    }
+
     let settings = Config::builder()
         .add_source(config::File::with_name("./assigner-config"))
         .build()
@@ -40,7 +62,7 @@ fn main() {
 
     match &args.command {
         Commands::Create { name } => {
-            if let Some((course_id, assignment_id)) = extract_course_and_assignment_ids(name) {
+            if let Some((course_id, assignment_id)) = extract_course_and_assignment_ids(name, &base_url) {
                 println!("Searching for an assignment with the course ID {} and the assignment ID {}...", course_id, assignment_id);
                 let course = Canvas::get_course(course_id as usize).unwrap().fetch(&canvas).unwrap().inner();
                 let assignment = course.get_assignment(assignment_id as usize).unwrap().fetch(&canvas).unwrap().inner();
@@ -55,7 +77,7 @@ fn main() {
         }
 
         Commands::Assignments { course_url, search } => {
-            if let Some(course_id) = extract_course_id(course_url) {
+            if let Some(course_id) = extract_course_id(course_url, &base_url) {
                 println!("Searching for a course with the ID {}...", course_id);
                 let course = Canvas::get_course(course_id as usize).unwrap().fetch(&canvas).unwrap().inner();
                 let assignments = course.get_assignments().unwrap().fetch(&canvas).unwrap().inner();
@@ -94,17 +116,19 @@ fn main() {
     }
 }
 
-fn extract_course_and_assignment_ids(input: &str) -> Option<(u32, u32)> {
-    let pattern = Regex::new(r"^https://sluh\.instructure\.com/courses/(\d+)/assignments/(\d+)$").unwrap();
-    let captures = pattern.captures(input)?;
+fn extract_course_and_assignment_ids(input: &str, base_url: &str) -> Option<(u32, u32)> {
+    let pattern = Regex::new(r"^courses/(\d+)/assignments/(\d+)$").unwrap();
+    let replaced = input.replace(base_url, "");
+    let captures = pattern.captures(&*replaced)?;
     let course_id = captures[1].parse::<u32>().unwrap();
     let assignment_id = captures[2].parse::<u32>().unwrap();
     Some((course_id, assignment_id))
 }
 
-fn extract_course_id(input: &str) -> Option<u32> {
-    let pattern = Regex::new(r"^https://sluh\.instructure\.com/courses/(\d+)$").unwrap();
-    let captures = pattern.captures(input)?;
+fn extract_course_id(input: &str, base_url: &str) -> Option<u32> {
+    let pattern = Regex::new(r"^courses/(\d+)$").unwrap();
+    let replaced = input.replace(base_url, "");
+    let captures = pattern.captures(&*replaced)?;
     let course_id = captures[1].parse::<u32>().unwrap();
     Some(course_id)
 }
