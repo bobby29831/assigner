@@ -1,4 +1,5 @@
-use canvasapi::prelude::Assignment;
+use canvasapi::canvas::CanvasInformation;
+use canvasapi::prelude::{Assignment, Course};
 use colored::Colorize;
 use config::Config;
 use regex::Regex;
@@ -71,6 +72,24 @@ fn print_assignments(assignments: Vec<Assignment>, max: usize) {
             }
         }
     }
+}
+
+fn search_courses(search: Option<String>) -> Vec<Course> {
+    let base_url = &get_base_url().expect("Base URL not populated.");
+    let canvas_token = &get_canvas_token().expect("Canvas Token not populated.");
+    let canvas = CanvasInformation::new(base_url, canvas_token);
+    let courses = Course::courses().unwrap().fetch(&canvas).unwrap().inner();
+    let pattern = search.unwrap_or("".parse().unwrap());
+
+    let mut filtered: Vec<Course> = Vec::new();
+    for course in courses {
+        if let Some(name) = &course.name {
+            if name.contains(&pattern) { filtered.push(course) }
+        } else {
+            continue;
+        }
+    };
+    return filtered;
 }
 
 // fn print_in_box(lines: Vec<&str>, padding: Option<usize>) {

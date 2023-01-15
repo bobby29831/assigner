@@ -1,14 +1,8 @@
-use canvasapi::canvas::CanvasInformation;
-use canvasapi::prelude::{Course};
 use colored::Colorize;
-use crate::commands::{get_base_url, get_canvas_token};
+use crate::commands::search_courses;
 
-pub fn handle_command() {
-    let base_url = &get_base_url().expect("Base URL not populated.");
-    let canvas_token = &get_canvas_token().expect("Canvas Token not populated.");
-    let canvas = CanvasInformation::new(base_url, canvas_token);
-
-    let courses = Course::courses().unwrap().fetch(&canvas).unwrap().inner();
+pub fn handle_command(search: &Option<String>) {
+    let courses = search_courses(search.to_owned());
     let largest = courses.iter().map(|c| c.id).max();
     for course in courses {
         if let Some(name) = course.name {

@@ -24,7 +24,9 @@ enum Commands {
     #[command(about = "check assignments in your todo list", long_about = None)]
     Todo {  },
     #[command(about = "see a list of all of your courses & course ids", long_about = None)]
-    Courses {  }
+    Courses {
+        search: Option<String>
+    }
 }
 
 fn main() {
@@ -56,6 +58,6 @@ fn main() {
         Commands::Assignments { course_url, search } => commands::assignments::handle_command(course_url, search),
         Commands::Create { name } => commands::create::handle_command(name),
         Commands::Todo {  } => commands::todo::handle_command(),
-        Commands::Courses {  } => commands::courses::handle_command()
+        Commands::Courses { search } => commands::courses::handle_command(search)
     }
 }
