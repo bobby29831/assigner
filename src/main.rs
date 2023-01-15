@@ -12,14 +12,19 @@ struct Args {
 
 #[derive(Subcommand)]
 enum Commands {
+    #[command(about = "view assignments for a course", long_about = None)]
     Assignments {
         course_url: String,
         search: Option<String>
     },
+    #[command(about = "create a document to submit as the assignment", long_about = None)]
     Create {
         name: String
     },
-    Todo {  }
+    #[command(about = "check assignments in your todo list", long_about = None)]
+    Todo {  },
+    #[command(about = "see a list of all of your courses & course ids", long_about = None)]
+    Courses {  }
 }
 
 fn main() {
@@ -50,6 +55,7 @@ fn main() {
     match &args.command {
         Commands::Assignments { course_url, search } => commands::assignments::handle_command(course_url, search),
         Commands::Create { name } => commands::create::handle_command(name),
-        Commands::Todo {  } => commands::todo::handle_command()
+        Commands::Todo {  } => commands::todo::handle_command(),
+        Commands::Courses {  } => commands::courses::handle_command()
     }
 }

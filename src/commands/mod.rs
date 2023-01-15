@@ -6,6 +6,7 @@ use regex::Regex;
 pub mod assignments;
 pub mod create;
 pub mod todo;
+pub mod courses;
 
 fn get_settings_config() -> Config {
     Config::builder()
@@ -71,3 +72,14 @@ fn print_assignments(assignments: Vec<Assignment>, max: usize) {
         }
     }
 }
+
+// fn print_in_box(lines: Vec<&str>, padding: Option<usize>) {
+//     let extra = padding.unwrap_or(1) * 2;
+//     let longest = lines.iter().fold(lines[0], |acc, &item| {
+//         if item.len() > acc.len() { item } else { acc }
+//     });
+//     let length = longest.len() + extra;
+//     println!("{}{}{}", "\u{250C}", "\u{2500}".repeat(length), "\u{2510}");
+//     lines.iter().for_each(|l| println!("{}{:^length$}{}", "\u{2502}", l, "\u{2502}"));
+//     println!("{}{}{}", "\u{2514}", "\u{2500}".repeat(length), "\u{2518}");
+// }
