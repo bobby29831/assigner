@@ -84,7 +84,7 @@ fn search_courses(search: Option<String>) -> Vec<Course> {
     let mut filtered: Vec<Course> = Vec::new();
     for course in courses {
         if let Some(name) = &course.name {
-            if name.contains(&pattern) { filtered.push(course) }
+            if name.to_lowercase().contains(&pattern.to_lowercase()) { filtered.push(course) }
         } else {
             continue;
         }

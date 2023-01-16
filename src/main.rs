@@ -14,8 +14,8 @@ struct Args {
 enum Commands {
     #[command(about = "view assignments for a course", long_about = None)]
     Assignments {
-        course_url: String,
-        search: Option<String>
+        course: String,
+        assignment: Option<String>
     },
     #[command(about = "create a document to submit as the assignment", long_about = None)]
     Create {
@@ -55,7 +55,7 @@ fn main() {
     }
 
     match &args.command {
-        Commands::Assignments { course_url, search } => commands::assignments::handle_command(course_url, search),
+        Commands::Assignments { course, assignment } => commands::assignments::handle_command(course, assignment),
         Commands::Create { name } => commands::create::handle_command(name),
         Commands::Todo {  } => commands::todo::handle_command(),
         Commands::Courses { search } => commands::courses::handle_command(search)
