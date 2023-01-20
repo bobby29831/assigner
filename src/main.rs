@@ -33,7 +33,7 @@ fn main() {
     let args = Args::parse();
 
     if File::open("./canvas-cli-config.toml").is_err() {
-        println!("It appears that this is your first time using assigner, or your configuration was deleted.");
+        println!("It appears that this is your first time using canvas-cli, or your configuration was deleted.");
 
         let mut base_url = String::new();
         println!("Because of this, please input your base canvas URL:");
@@ -43,13 +43,13 @@ fn main() {
         println!("Please input your canvas token:");
         std::io::stdin().read_line(&mut canvas_token).expect("Failure to read canvas URL from input");
 
-        match File::create("./assigner-config.toml") {
+        match File::create("./canvas-cli-config.toml") {
             Ok(_) => {
                 let data = format!("base_url = \"{}\"\ncanvas_token = \"{}\"", base_url.trim(), canvas_token.trim());
-                std::fs::write("./assigner-config.toml", data).expect("Failure to write data to file.");
+                std::fs::write("./canvas-cli-config.toml", data).expect("Failure to write data to file.");
             }
             Err(_) => {
-                println!("Failure to create assigner configuration file.")
+                println!("Failure to create canvas-cli configuration file.")
             }
         }
     }

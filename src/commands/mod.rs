@@ -11,7 +11,7 @@ pub mod courses;
 
 fn get_settings_config() -> Config {
     Config::builder()
-        .add_source(config::File::with_name("./assigner-config"))
+        .add_source(config::File::with_name("./canvas-cli-config"))
         .build()
         .unwrap()
 }

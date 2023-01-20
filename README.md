@@ -1,7 +1,7 @@
 # Canvas CLI
 
 ### Startup & Setup
-There are a few things that you will need in order to start using assigner, and those things are:
+There are a few things that you will need in order to start using canvas-cli, and those things are:
 - the base url for the canvas instance you are wanting to use (ex. `https://example.instructure.com/`)
 - an access token provided by canvas (for testing purposes)
 - the built binary/executable from building this project (coming in releases SoonTM)
