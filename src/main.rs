@@ -32,7 +32,7 @@ enum Commands {
 fn main() {
     let args = Args::parse();
 
-    if File::open("./assigner-config.toml").is_err() {
+    if File::open("./canvas-cli-config.toml").is_err() {
         println!("It appears that this is your first time using assigner, or your configuration was deleted.");
 
         let mut base_url = String::new();
