@@ -3,6 +3,7 @@ use canvasapi::prelude::{Assignment, Course};
 use colored::Colorize;
 use config::Config;
 use regex::Regex;
+use directories::ProjectDirs;
 
 pub mod assignments;
 pub mod create;
@@ -10,8 +11,10 @@ pub mod todo;
 pub mod courses;
 
 fn get_settings_config() -> Config {
+    let config_path = get_proj_dirs().config_dir().to_str().unwrap().to_string() + "/config.toml";
+
     Config::builder()
-        .add_source(config::File::with_name("./canvas-cli-config"))
+        .add_source(config::File::with_name(&config_path))
         .build()
         .unwrap()
 }
@@ -28,17 +31,6 @@ fn get_canvas_token() -> Option<String> {
         Ok(url) => { Some(url) }
         Err(_) => { None }
     }
-}
-
-fn extract_course_id(input: &str) -> Option<u32> {
-    if let Some(base_url) = get_base_url() {
-        let pattern = Regex::new(r"^courses/(\d+)$").unwrap();
-        let replaced = input.replace(&*base_url, "");
-        let captures = pattern.captures(&*replaced)?;
-        let course_id = captures[1].parse::<u32>().unwrap();
-        return Some(course_id);
-    }
-    None
 }
 
 fn extract_course_and_assignment_ids(input: &str) -> Option<(u32, u32)> {
@@ -92,13 +84,6 @@ fn search_courses(search: Option<String>) -> Vec<Course> {
     return filtered;
 }
 
-// fn print_in_box(lines: Vec<&str>, padding: Option<usize>) {
-//     let extra = padding.unwrap_or(1) * 2;
-//     let longest = lines.iter().fold(lines[0], |acc, &item| {
-//         if item.len() > acc.len() { item } else { acc }
-//     });
-//     let length = longest.len() + extra;
-//     println!("{}{}{}", "\u{250C}", "\u{2500}".repeat(length), "\u{2510}");
-//     lines.iter().for_each(|l| println!("{}{:^length$}{}", "\u{2502}", l, "\u{2502}"));
-//     println!("{}{}{}", "\u{2514}", "\u{2500}".repeat(length), "\u{2518}");
-// }
+fn get_proj_dirs() -> ProjectDirs {
+    ProjectDirs::from("com", "bobby29831", "Canvas-CLI").expect("Could not get 'proj_dirs' for some reason...")
+}
